@@ -2,6 +2,9 @@ package cn.mingyu.springbootcache.service;
 
 import cn.mingyu.springbootcache.dao.EmploymentDao;
 import cn.mingyu.springbootcache.entity.Employee;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +20,14 @@ import javax.annotation.Resource;
  * @since JDK 1.8
  */
 @Service
+@CacheConfig(cacheNames = "emp")
 public class EmployeeServiceImpl implements EmployeeService{
 
     @Resource
     private EmploymentDao employmentDao;
 
     @Override
-    @Cacheable(cacheNames = "emp", key = "#id", condition = "#id > 0", unless = "#result == null")
+    @Cacheable(key = "#id", condition = "#id > 0", unless = "#result == null")
     public Employee getEmployeeById(int id) {
         return employmentDao.selectEmployeeById(id);
     }
@@ -34,12 +38,16 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
 
     @Override
-    public int updateEmployee(Employee employee) {
-        return employmentDao.updateEmployee(employee);
+    @CachePut(cacheNames = "emp", key="#employee.id")
+    public Employee updateEmployee(Employee employee) {
+        employmentDao.updateEmployee(employee);
+        return employee;
     }
 
     @Override
+    @CacheEvict(cacheNames = "emp", key = "#id", beforeInvocation = true)
     public int deleteEmployee(int id) {
         return employmentDao.deleteEmployee(id);
     }
+
 }

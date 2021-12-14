@@ -30,5 +30,18 @@ public class EmployeeController {
         return employeeService.getEmployeeById(id);
     }
 
+    @GetMapping(path = "updateEmployee")
+    public Employee updateEmployee(@RequestParam(name = "id") Integer id){
+        Employee employee = employeeService.getEmployeeById(id);
+        employee.setLastName("李四");
+        Employee newEmployee = employeeService.updateEmployee(employee);
+        return newEmployee;
+    }
+
+    @GetMapping(path = "deleteEmployee")
+    public Integer deleteEmployee(@RequestParam(name = "id") Integer id){
+        return employeeService.deleteEmployee(id);
+    }
+
 
 }
